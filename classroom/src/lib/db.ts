@@ -34,12 +34,12 @@ export async function findProfileById(id: string): Promise<Profile | null> {
 }
 
 export async function createProfile(profile: Omit<Profile, 'createdAt'>): Promise<void> {
-  await supabase.from('profiles').insert({
+  await supabase.from('profiles').upsert({
     id: profile.id,
     name: profile.name,
     role: profile.role,
     avatar: profile.avatar,
-  })
+  },{onConflict:'id'})
 }
 
 // ─── Courses ──────────────────────────────────────────────────────────────────
