@@ -39,7 +39,7 @@ async function selectRole(role: UserRole) {
         <Button
           variant="outline"
           class="h-24 flex flex-col gap-2 opacity-40 cursor-not-allowed"
-          :disabled="true"
+          :disabled="isSubmitting"
         >
           <span class="text-2xl">👩‍🏫</span>
           <span>我是老師</span>
