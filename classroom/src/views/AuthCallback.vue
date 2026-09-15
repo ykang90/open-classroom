@@ -35,6 +35,8 @@ function redirect() {
     router.replace('/onboarding')
   } else if (authStore.isTeacher) {
     router.replace('/teacher')
+  } else if (authStore.isStudent) {
+    router.replace('/student')
   } else {
     router.replace('/')
   }
