@@ -1,6 +1,5 @@
 export const config = { runtime: 'edge' }
-
-import { verifyApiKey, jsonResponse, errorResponse, supabase, withErrorHandler } from '../_lib/all'
+import { verifyApiKey, jsonResponse, errorResponse, supabase, withErrorHandler } from '../../_lib/all'
 
 export default withErrorHandler(async function handler(req: Request): Promise<Response> {
   if (req.method !== 'PATCH') return errorResponse('Method not allowed', 405)
@@ -13,13 +12,20 @@ export default withErrorHandler(async function handler(req: Request): Promise<Re
   const parts = url.pathname.split('/')
   const id = parts[parts.length - 1]
 
-  const body = await req.json() as any
+  // 改用 text 再转 json，修复 edge 打包模块报错
+  const rawText = await req.text()
+  const body = JSON.parse(rawText) as any
 
-  // camelCase → snake_case 對應
+  // camelCase → snake_case 映射
   const mapping: Record<string, string> = {
-    title: 'title', description: 'description', isActive: 'is_active',
-    dueDate: 'due_date', releaseDate: 'release_date', submitType: 'submit_type',
-    showcaseEnabled: 'showcase_enabled', showcaseRequireApproval: 'showcase_require_approval',
+    title: 'title',
+    description: 'description',
+    isActive: 'is_active',
+    dueDate: 'due_date',
+    releaseDate: 'release_date',
+    submitType: 'submit_type',
+    showcaseEnabled: 'showcase_enabled',
+    showcaseRequiredApproval: 'showcase_require_approval',
   }
 
   const updateData: Record<string, unknown> = {}
@@ -33,9 +39,7 @@ export default withErrorHandler(async function handler(req: Request): Promise<Re
     .from('assignments')
     .update(updateData)
     .eq('id', id)
-    .select()
-    .single()
 
   if (error) return errorResponse(error.message, 500)
-  return jsonResponse(data)
+  return jsonResponse({ data })
 })
