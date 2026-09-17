@@ -1,11 +1,10 @@
 export const config = { runtime: 'edge' }
+import { verifySessionJwt, jsonResponse, errorResponse, supabase, withErrorHandler } from '~/lib/api'
+import { NextRequest } from 'next/server'
 
-import { verifySessionJwt, jsonResponse, errorResponse, supabase, withErrorHandler } from '../_lib/all'
-
-export default withErrorHandler(async function handler(req: Request): Promise<Response> {
+export default withErrorHandler(async function handler(req: NextRequest): Promise<Response> {
   if (req.method !== 'DELETE') return errorResponse('Method not allowed', 405)
 
-  // 使用 Supabase session JWT（非 API Key）
   const auth = await verifySessionJwt(req)
   if (!auth) return errorResponse('Unauthorized', 401)
 
@@ -13,7 +12,8 @@ export default withErrorHandler(async function handler(req: Request): Promise<Re
   const parts = url.pathname.split('/')
   const id = parts[parts.length - 1]
 
-  // 只能刪除自己的 key（user_id 限制確保安全）
+  if (!id) return errorResponse('Missing key id', 400)
+
   const { error } = await supabase
     .from('api_keys')
     .delete()
