@@ -57,7 +57,7 @@ const newCourse = ref({
   description: '',
 })
 
-const userName = computed(() => authStore.profile?.name || '老師')
+const userName = computed(() => authStore.profile?.name || '老师')
 
 onMounted(async () => {
   await loadCourses()
@@ -116,7 +116,7 @@ async function handleCreateCourse() {
         courseCode: generateCourseCode(),
         teacherId: authStore.profile.id,
       }, authStore.session?.access_token),
-      '建立課程逾時，請確認網路連線或 Supabase 狀態後再試。',
+      '建立课程逾时，请确认网路连线或 Supabase 状态后再试。',
       35000
     )
 
@@ -128,7 +128,7 @@ async function handleCreateCourse() {
 
     withTimeout(
       loadCourses(),
-      '課程已送出，但重新載入列表逾時。請重新整理頁面確認結果。'
+      '课程已送出，但重新载入列表逾时。请重新整理页面确认结果。'
     ).catch((e) => {
       console.warn('Created course, but failed to refresh course list:', e)
     })
@@ -153,10 +153,10 @@ function getCreateCourseErrorMessage(e: unknown): string {
   const message = e instanceof Error ? e.message : String(e)
 
   if (message.includes('schema cache')) {
-    return '建立失敗：Supabase schema cache 尚未更新，請稍後再試。'
+    return '建立失败：Supabase schema cache 尚未更新，请稍后再试。'
   }
 
-  return message || '建立課程失敗，請稍後再試。'
+  return message || '建立课程失败，请稍后再试。'
 }
 
 const isApiKeyDialogOpen = ref(false)
@@ -202,7 +202,7 @@ async function generateApiKey() {
 async function revokeApiKey(id: string) {
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) return
-  await fetch(`/api/keys/${id}`, {
+  await fetch(`/api/keys/delete?id=${id}`, {
     method: 'DELETE',
     headers: { 'Authorization': `Bearer ${session.access_token}` },
   })
@@ -235,7 +235,7 @@ function handleLogout() {
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <div class="flex items-center gap-2">
           <BookOpen class="h-6 w-6 text-slate-900" />
-          <span class="text-xl font-bold">作業管理系統 - 教師端</span>
+          <span class="text-xl font-bold">作业管理系统 - 教师端</span>
         </div>
         <div class="flex items-center gap-4">
           <span class="text-sm text-slate-600">{{ userName }}</span>
@@ -265,17 +265,17 @@ function handleLogout() {
       <div class="mb-8">
         <Button @click="isCreateDialogOpen = true">
           <Plus class="h-4 w-4 mr-2" />
-          建立新課程
+          建立新课程
         </Button>
       </div>
 
       <!-- My Courses -->
       <div>
-        <h2 class="text-xl font-semibold mb-4">我的課程</h2>
+        <h2 class="text-xl font-semibold mb-4">我的课程</h2>
         <div v-if="myCourses.length === 0" class="text-center py-12 text-slate-500">
           <BookOpen class="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p>您還沒有建立任何課程</p>
-          <p class="text-sm">點擊上方按鈕建立您的第一門課程！</p>
+          <p>您还没有建立任何课程</p>
+          <p class="text-sm">点击上方按钮建立您的第一门课程！</p>
         </div>
         <div v-else class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <Card
@@ -292,15 +292,15 @@ function handleLogout() {
               <div class="flex items-center gap-4 text-sm text-slate-600">
                 <span class="flex items-center gap-1">
                   <Users class="h-4 w-4" />
-                  {{ getStudentCount(course.id) }} 位學生
+                  {{ getStudentCount(course.id) }} 位学生
                 </span>
                 <span class="flex items-center gap-1">
                   <BookOpen class="h-4 w-4" />
-                  {{ getAssignmentCount(course.id) }} 個作業
+                  {{ getAssignmentCount(course.id) }} 个作业
                 </span>
               </div>
               <div class="mt-4">
-                <Badge variant="secondary">課程碼：{{ course.courseCode }}</Badge>
+                <Badge variant="secondary">课程码：{{ course.courseCode }}</Badge>
               </div>
             </CardContent>
           </Card>
@@ -312,23 +312,23 @@ function handleLogout() {
     <Dialog v-model:open="isCreateDialogOpen">
       <div class="space-y-4">
         <DialogHeader>
-          <DialogTitle>建立新課程</DialogTitle>
+          <DialogTitle>建立新课程</DialogTitle>
         </DialogHeader>
         <div class="space-y-4">
           <div class="space-y-2">
-            <Label for="courseName">課程名稱</Label>
+            <Label for="courseName">课程名称</Label>
             <Input
               id="courseName"
               v-model="newCourse.name"
-              placeholder="輸入課程名稱"
+              placeholder="输入课程名称"
             />
           </div>
           <div class="space-y-2">
-            <Label for="courseDescription">課程描述</Label>
+            <Label for="courseDescription">课程描述</Label>
             <Textarea
               id="courseDescription"
               v-model="newCourse.description"
-              placeholder="輸入課程描述"
+              placeholder="输入课程描述"
               :rows="3"
             />
           </div>
@@ -360,22 +360,22 @@ function handleLogout() {
           </DialogHeader>
 
           <div class="mt-4">
-            <Label>產生新 Key</Label>
+            <Label>生成新 Key</Label>
             <div class="flex gap-2 mt-1">
-              <Input v-model="newKeyLabel" placeholder="裝置名稱，例如：我的 MacBook" class="flex-1" />
+              <Input v-model="newKeyLabel" placeholder="装置名称，例如：我的 MacBook" class="flex-1" />
               <Button :disabled="isGeneratingKey || !newKeyLabel.trim()" @click="generateApiKey">
                 <Loader2 v-if="isGeneratingKey" class="w-4 h-4 animate-spin mr-1" />
-                產生
+                生成
               </Button>
             </div>
           </div>
 
           <div v-if="generatedKey" class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
-            <p class="text-sm font-medium text-yellow-800">請立即複製，之後無法再看到</p>
+            <p class="text-sm font-medium text-yellow-800">请立即复制，之后无法再看到</p>
             <div class="flex gap-2 mt-2">
               <code class="flex-1 text-xs bg-white p-2 rounded border break-all">{{ generatedKey }}</code>
               <Button size="sm" variant="outline" @click="copyKey">
-                {{ isCopied ? '已複製' : '複製' }}
+                {{ isCopied ? '已复制' : '复制' }}
               </Button>
             </div>
           </div>
@@ -390,19 +390,19 @@ function handleLogout() {
                 <p class="text-xs text-gray-400">
                   建立：{{ new Date(key.created_at).toLocaleDateString('zh-TW') }}
                   <span v-if="key.last_used_at">
-                    · 最後使用：{{ new Date(key.last_used_at).toLocaleDateString('zh-TW') }}
+                    · 最后使用：{{ new Date(key.last_used_at).toLocaleDateString('zh-TW') }}
                   </span>
                 </p>
               </div>
               <Button size="sm" variant="outline" class="text-red-600 border-red-200 hover:bg-red-50"
                       @click="revokeApiKey(key.id)">
-                撤銷
+                删除
               </Button>
             </div>
           </div>
 
           <div class="mt-4 flex justify-end">
-            <Button variant="outline" @click="isApiKeyDialogOpen = false">關閉</Button>
+            <Button variant="outline" @click="isApiKeyDialogOpen = false">关闭</Button>
           </div>
         </div>
       </div>
