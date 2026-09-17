@@ -7,7 +7,7 @@ export default withErrorHandler(async function handler(req: NextRequest): Promis
 
   const auth = await verifySessionJwt(req)
   if (!auth) return errorResponse('Unauthorized', 401)
-
+  
   const url = new URL(req.url)
   const parts = url.pathname.split('/')
   const id = parts[parts.length - 1]
